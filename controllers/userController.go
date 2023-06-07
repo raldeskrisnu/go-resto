@@ -25,8 +25,23 @@ func GetUsers() gin.HandlerFunc {
 }
 
 func GetUser() gin.HandlerFunc {
-	return func(context *gin.Context) {
+	return func(c *gin.Context) {
+		var ctx, cancel = context.WithTimeout(context.Background(), 100+time.Second)
 
+		userId := c.Param("user_id")
+
+		var user models.User
+
+		err := userCollection.FindOne(ctx, bson.M{"user_id": userId}).Decode(&user)
+
+		defer cancel()
+
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while listing user items"})
+
+		}
+
+		c.JSON(http.StatusOK, user)
 	}
 }
 
@@ -41,22 +56,23 @@ func SignUp() gin.HandlerFunc {
 			return
 		}
 
-		//validationErr := validate.Struct(user)
-		//if validationErr != nil {
-		//	c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
-		//	return
-		//}
+		validationErr := validation.Struct(user)
+		if validationErr != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": validationErr.Error()})
+			return
+		}
+
 		//you'll check if the email has already been used by another user
 
 		count, err := userCollection.CountDocuments(ctx, bson.M{"email": user.Email})
 		defer cancel()
 		if err != nil {
 			log.Panic(err)
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "error occured while checking for the email"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "email already registered"})
 			return
 		}
-		//hash password
 
+		//hash password
 		password := HashPassword(*user.Password)
 		user.Password = &password
 
