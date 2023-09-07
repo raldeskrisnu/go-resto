@@ -1,8 +1,9 @@
 package models
 
 import (
-	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
+
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Invoice struct {
@@ -10,7 +11,7 @@ type Invoice struct {
 	Invoice_id       string             `json:"invoice_id"`
 	Order_id         string             `json:"order_id"`
 	Payment_method   *string            `json:"payment_method" validate:"eq=CARD|eq=CASH|eq="`
-	Payment_status   *string            `json:"payment_status" validate:"required, eq=PENDING|eq=PAID"`
+	Payment_status   *string            `json:"payment_status" validate:"required,eq=PENDING|eq=PAID"`
 	Payment_due_date time.Time          `json:"payment_due_date"`
 	Created_at       time.Time          `json:"created_at"`
 	Updated_at       time.Time          `json:"Updated_at"`

@@ -3,18 +3,19 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"go-resto-management/database"
 	helper "go-resto-management/helpers"
 	"go-resto-management/models"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"golang.org/x/crypto/bcrypt"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"golang.org/x/crypto/bcrypt"
 )
 
 var userCollection *mongo.Collection = database.OpenCollection(database.Client, "user")
@@ -147,9 +148,13 @@ func SignUp() gin.HandlerFunc {
 			return
 		}
 		defer cancel()
-		//return status OK and send the result back
 
-		c.JSON(http.StatusOK, resultInsertionNumber)
+		//return status OK and send the result back
+		if resultInsertionNumber != nil {
+			msg := fmt.Sprintf("User Create Successfully")
+			c.JSON(http.StatusOK, gin.H{"success": msg})
+		}
+
 	}
 }
 
@@ -189,7 +194,8 @@ func Login() gin.HandlerFunc {
 		helper.UpdateAllTokens(token, refreshToken, foundUser.User_id)
 
 		//return statusOK
-		c.JSON(http.StatusOK, foundUser)
+
+		c.JSON(http.StatusOK, gin.H{"refresh_token": foundUser.Refresh_token})
 	}
 }
 

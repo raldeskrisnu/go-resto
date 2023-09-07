@@ -3,19 +3,25 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"go-resto-management/database"
 	"go-resto-management/models"
+	"log"
+	"net/http"
+	"time"
+
+	"github.com/gin-gonic/gin"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
-	"log"
-	"net/http"
-	"time"
 )
 
 var orderCollection *mongo.Collection = database.OpenCollection(database.Client, "order")
+
+type MyData struct {
+	Something  string
+	Collection []mongo.Cursor
+}
 
 func GetOrders() gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -95,7 +101,12 @@ func CreateOrder() gin.HandlerFunc {
 		}
 
 		defer cancel()
-		c.JSON(http.StatusOK, result)
+
+		if result != nil {
+			msg := "Create Order Successfully"
+			c.JSON(http.StatusOK, gin.H{"success": msg})
+		}
+
 	}
 }
 

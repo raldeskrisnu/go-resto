@@ -3,19 +3,20 @@ package controllers
 import (
 	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"github.com/go-playground/validator/v10"
 	"go-resto-management/database"
 	"go-resto-management/models"
-	"go.mongodb.org/mongo-driver/bson"
-	"go.mongodb.org/mongo-driver/bson/primitive"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 	"log"
 	"math"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 var foodCollection *mongo.Collection = database.OpenCollection(database.Client, "food")
@@ -124,7 +125,12 @@ func CreateFood() gin.HandlerFunc {
 			return
 		}
 		defer cancel()
-		c.JSON(http.StatusOK, result)
+
+		if result != nil {
+			msg := "Food Created Successfully"
+			c.JSON(http.StatusOK, gin.H{"success": msg})
+		}
+
 	}
 }
 
